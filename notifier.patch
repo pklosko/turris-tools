@@ -1,0 +1,56 @@
+--- notifier    2022-01-01 20:43:16.568762047 +0100
++++ notifier.bak        2022-01-01 20:28:25.196577003 +0100
+@@ -336,7 +336,6 @@
+        if [ "$smtp_enabled" -eq 0 ]; then
+                echo "User notifications are not enabled."
+        else
+-               pushover_msg
+                create_msmtp_config
+                msmtp -C "$msmtp_cfg_file" -t < "$mail_file" || {
+                        echo "notifier: msmtp has failed to send e-mail notification" >&2
+@@ -348,16 +347,6 @@
+        unlock
+ }
+
+-pushover_msg() {
+-        if [ -f "$mail_file" ]; then
+-          cat $mail_file > /tmp/notif.txt
+-#         SUBJ=`cat $msg_file | grep Subject | awk '{for (i=2; i<NF; i++) printf $i " "; print $NF}'`
+-          MSG=`cat $mail_file | tail +8 | grep -v '^#'`
+-          /etc/scripts/pushover.sh "$MSG"
+-        fi
+-
+-}
+-
+
+ send_mail
+
+root@AP-Wichterlova:/usr/bin# diff -u notifier.bak notifier > /etc/scripts/notifier.patch
+root@AP-Wichterlova:/usr/bin# cat /etc/scripts/notifier.patch
+--- notifier.bak        2022-01-01 20:28:25.196577003 +0100
++++ notifier    2022-01-01 20:43:16.568762047 +0100
+@@ -336,6 +336,7 @@
+        if [ "$smtp_enabled" -eq 0 ]; then
+                echo "User notifications are not enabled."
+        else
++               pushover_msg
+                create_msmtp_config
+                msmtp -C "$msmtp_cfg_file" -t < "$mail_file" || {
+                        echo "notifier: msmtp has failed to send e-mail notification" >&2
+@@ -347,6 +348,16 @@
+        unlock
+ }
+
++pushover_msg() {
++        if [ -f "$mail_file" ]; then
++          cat $mail_file > /tmp/notif.txt
++#         SUBJ=`cat $msg_file | grep Subject | awk '{for (i=2; i<NF; i++) printf $i " "; print $NF}'`
++          MSG=`cat $mail_file | tail +8 | grep -v '^#'`
++          /etc/scripts/pushover.sh "$MSG"
++        fi
++
++}
++
+
+ send_mail
+
